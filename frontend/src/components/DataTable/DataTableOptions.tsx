@@ -15,7 +15,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Plus } from "lucide-react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Row } from "@tanstack/react-table";
 import {
 	CreateEntry,
@@ -23,24 +23,31 @@ import {
 	DeleteEntry,
 	UpdateEntry,
 } from "./DataTableTypes";
-import { Mode } from "./DataTableContext";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DataTableForm from "./DataTableForm";
 import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DataTableContext } from "./DataTableContext";
 
 export function DataTableCreate<T>(
-	data: T[],
+	queryKey: any[],
 	definition: Definition<T>[],
 	defaultValues: T,
 	onCreate: CreateEntry<T>
 ) {
+	const queryClient = useQueryClient();
+	const { table } = useContext(DataTableContext);
 	const [open, setOpen] = useState(false);
 	const schema = getSchema();
 	const form = useForm<z.infer<typeof schema>>({
 		resolver: zodResolver(schema),
 		defaultValues: defaultValues as { [x: string]: any },
 	});
+
+	useEffect(() => {
+		form.reset();
+	}, [open]);
 
 	function getSchema() {
 		function map({ primaryKey, accessorKey, type }: Definition<T>) {
@@ -61,6 +68,7 @@ export function DataTableCreate<T>(
 	}
 
 	function uniquePrimaryKey(pk: keyof T, value: any): boolean {
+		const data = queryClient.getQueryData<T[]>(queryKey) ?? [];
 		for (let i = 0; i < data.length; i++) {
 			if (data[i][pk] === value) {
 				return false;
@@ -70,10 +78,27 @@ export function DataTableCreate<T>(
 		return true;
 	}
 
+	const { mutate: mutateCreate } = useMutation({
+		mutationFn: onCreate,
+		onMutate: async (created: T) => {
+			await queryClient.cancelQueries({ queryKey });
+			const prev = queryClient.getQueryData<T[]>(queryKey);
+			queryClient.setQueryData(queryKey, (old: T[]) => [
+				...(old || []),
+				created,
+			]);
+
+			return { prev };
+		},
+		onError: (_, __, context) => {
+			queryClient.setQueryData(queryKey, context?.prev);
+		},
+	});
+
 	function onSubmit(to: T) {
-		onCreate(to);
+		mutateCreate(to);
 		setOpen(false);
-		// TODO - create entry in table
+		table.lastPage();
 	}
 
 	return (
@@ -108,21 +133,29 @@ export function DataTableCreate<T>(
 }
 
 export function DataTableUpdateDelete<T extends object>(
-	data: T[],
+	queryKey: any[],
 	definition: Definition<T>[],
 	defaultValues: T,
 	row: Row<T>,
 	onUpdate: UpdateEntry<T>,
 	onDelete: DeleteEntry<T>
 ) {
-	const [mode, setMode] = useState<Mode>("DELETE");
+	let _pk: keyof T = "" as keyof T;
+	const queryClient = useQueryClient();
+	const [mode, setMode] = useState<"UPDATE" | "DELETE">("DELETE");
 	const [open, setOpen] = useState(false);
-	const defaultValuesRow = defaultValuesFromRow();
+	const [defaultValuesRow, setDefaultValuesRow] = useState(
+		defaultValuesFromRow()
+	);
 	const schema = getSchema();
 	const form = useForm<z.infer<typeof schema>>({
 		resolver: zodResolver(schema),
 		defaultValues: defaultValuesRow as { [x: string]: any },
 	});
+
+	useEffect(() => {
+		form.reset(defaultValuesRow);
+	}, [open]);
 
 	function defaultValuesFromRow(): T {
 		let t: any = {};
@@ -139,6 +172,7 @@ export function DataTableUpdateDelete<T extends object>(
 			if (primaryKey === undefined) {
 				return [accessorKey, type];
 			} else {
+				_pk = accessorKey;
 				return [
 					accessorKey,
 					type.refine(
@@ -157,6 +191,7 @@ export function DataTableUpdateDelete<T extends object>(
 			return true;
 		}
 
+		const data = queryClient.getQueryData<T[]>(queryKey) ?? [];
 		for (let i = 0; i < data.length; i++) {
 			if (data[i][pk] === value) {
 				return false;
@@ -166,18 +201,35 @@ export function DataTableUpdateDelete<T extends object>(
 		return true;
 	}
 
+	const { mutate: mutateUpdate } = useMutation({
+		mutationFn: ({ from, to }: { from: T; to: T }) => onUpdate(from, to),
+		onMutate: async ({ from, to }) => {
+			await queryClient.cancelQueries({ queryKey });
+			const prev = queryClient.getQueryData<T[]>(queryKey);
+			queryClient.setQueryData(queryKey, (old: T[]) =>
+				old?.map((o) => (o[_pk] == from[_pk] ? to : o))
+			);
+
+			return { prev };
+		},
+		onError: (_, __, context) => {
+			queryClient.setQueryData(queryKey, context?.prev);
+		},
+	});
+
 	function EditTableUpdate() {
 		function onSubmit(to: T) {
-			onUpdate(defaultValues, to);
+			mutateUpdate({ from: defaultValuesRow, to });
+			setDefaultValuesRow(to);
 			setOpen(false);
-			// TODO - update entry in table
-			// TODO - update default values
 		}
 
 		return (
 			<>
 				<DialogHeader>
-					<DialogTitle>Update Entry</DialogTitle>
+					<DialogTitle>
+						Update Entry "{String(defaultValuesRow[_pk])}"
+					</DialogTitle>
 					<DialogDescription>
 						Update the values of an entry in the database.
 					</DialogDescription>
@@ -191,17 +243,34 @@ export function DataTableUpdateDelete<T extends object>(
 		);
 	}
 
+	const { mutate: mutateDelete } = useMutation({
+		mutationFn: onDelete,
+		onMutate: async (deleted) => {
+			await queryClient.cancelQueries({ queryKey });
+			const prev = queryClient.getQueryData<T[]>(queryKey);
+			queryClient.setQueryData(queryKey, (old: T[]) =>
+				old?.filter((o) => o[_pk] !== deleted[_pk])
+			);
+
+			return { prev };
+		},
+		onError: (_, __, context) => {
+			queryClient.setQueryData(queryKey, context?.prev);
+		},
+	});
+
 	function EditTableDelete() {
 		function onSubmit() {
-			onDelete(data[parseInt(row.id)]);
+			mutateDelete(defaultValuesRow);
 			setOpen(false);
-			// TODO - remove entry from table
 		}
 
 		return (
 			<>
 				<DialogHeader>
-					<DialogTitle>Delete Entry</DialogTitle>
+					<DialogTitle>
+						Delete Entry "{String(defaultValuesRow[_pk])}"
+					</DialogTitle>
 					<DialogDescription>
 						This action cannot be undone. Are you sure you want to
 						permanently delete this entry from the database?

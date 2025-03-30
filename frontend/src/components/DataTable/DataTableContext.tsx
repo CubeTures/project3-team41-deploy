@@ -1,16 +1,11 @@
+import { Table } from "@tanstack/react-table";
 import { createContext } from "react";
 
-export type Mode = "CREATE" | "UPDATE" | "DELETE";
 interface ContextType {
-	mode: Mode;
-	setMode: React.Dispatch<React.SetStateAction<Mode>>;
+	table: Table<any>;
 }
 
 export const DataTableContext = createContext<ContextType>({
-	mode: "DELETE",
-	setMode: unimplemented,
+	table: {} as Table<any>,
 });
 
-function unimplemented() {
-	throw new Error("This function was not defined.");
-}

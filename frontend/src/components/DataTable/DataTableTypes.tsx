@@ -3,19 +3,20 @@ import { JSX } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { z, ZodTypeAny } from "zod";
 
-export interface Definition<T, K = unknown> {
+// TODO - default hidden
+export interface Definition<T> {
 	primaryKey?: boolean;
 	accessorKey: keyof T;
 	header: string;
 	sortable?: boolean;
 	cell?: (row: Row<T>) => JSX.Element;
 	type: ZodTypeAny;
-	preprocess?: (obj: unknown) => K;
 }
 
-export type CreateEntry<T> = (entry: T) => void;
-export type UpdateEntry<T> = (from: T, to: T) => void;
-export type DeleteEntry<T> = (entry: T) => void;
+export type GetEntries<T> = () => Promise<T[]>;
+export type CreateEntry<T> = (entry: T) => Promise<void>;
+export type UpdateEntry<T> = (from: T, to: T) => Promise<void>;
+export type DeleteEntry<T> = (entry: T) => Promise<void>;
 export type OnSubmit<T> = (to: T) => void;
 
 export type SchemaType = z.ZodObject<

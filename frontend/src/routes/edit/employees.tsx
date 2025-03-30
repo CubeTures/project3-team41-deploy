@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import DataTable from "@/components/DataTable/DataTable";
 import { Definition } from "@/components/DataTable/DataTableTypes";
 import { z } from "zod";
+import { ok } from "@/lib/fetchUtils";
+import { API_URL } from "@/lib/constants";
 
 export const Route = createFileRoute("/edit/employees")({
 	component: RouteComponent,
@@ -73,33 +74,48 @@ const definition: Definition<Employee>[] = [
 ];
 
 function RouteComponent() {
-	const { status, data, error } = useQuery({
-		queryKey: ["employees"],
-		queryFn: get,
-	});
-
-	async function get() {
-		const res = await fetch("http://localhost:3000/employees");
-		if (!res.ok) {
-			throw new Error("Network response was not ok");
-		}
+	async function onGet(): Promise<Employee[]> {
+		const res = await ok(
+			fetch(`${API_URL}/edit/employees`, {
+				method: "GET",
+			})
+		);
 		return res.json();
 	}
 
-	if (status === "pending") {
-		return <h1>Loading...</h1>;
+	async function onCreate(employee: Employee) {
+		await ok(
+			fetch(`${API_URL}/edit/employees`, {
+				method: "POST",
+				body: JSON.stringify(employee),
+			})
+		);
 	}
 
-	if (status === "error") {
-		return <h1>There was an error when loading the data.</h1>;
+	async function onUpdate(from: Employee, to: Employee) {
+		await ok(
+			fetch(`${API_URL}/edit/employees`, {
+				method: "PUT",
+				body: JSON.stringify({ from, to }),
+			})
+		);
+	}
+
+	async function onDelete(employee: Employee) {
+		await ok(
+			fetch(`${API_URL}/edit/employees`, {
+				method: "DELETE",
+				body: JSON.stringify(employee),
+			})
+		);
 	}
 
 	return (
 		<div className="px-4 flex flex-col gap-4">
 			<h1 className="text-2xl font-bold">Edit Employees</h1>
 			<DataTable<Employee>
+				queryKey={["edit", "employees"]}
 				definition={definition}
-				data={data}
 				defaultValues={{
 					employee_id: 0,
 					hours_worked: 0,
@@ -108,17 +124,10 @@ function RouteComponent() {
 					password: "Password",
 					wage: 0,
 				}}
-				onCreate={(employee) => {
-					console.log(`Create employee ${JSON.stringify(employee)}`);
-				}}
-				onUpdate={(from, to) =>
-					console.log(
-						`Update employee ${JSON.stringify(from)} to ${JSON.stringify(to)}`
-					)
-				}
-				onDelete={(employee) =>
-					console.log(`Delete employee ${JSON.stringify(employee)}`)
-				}
+				onGet={onGet}
+				onCreate={onCreate}
+				onUpdate={onUpdate}
+				onDelete={onDelete}
 			/>
 		</div>
 	);

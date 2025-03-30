@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import DataTable from "@/components/DataTable/DataTable";
 import { Definition } from "@/components/DataTable/DataTableTypes";
 import { z } from "zod";
 import { API_URL } from "@/lib/constants";
+import { ok } from "@/lib/fetchUtils";
 
 export const Route = createFileRoute("/edit/menu")({
 	component: RouteComponent,
@@ -50,7 +50,7 @@ const definition: Definition<MenuItem>[] = [
 		header: "Ingredients",
 		sortable: true,
 		cell: (row) => {
-			const ingredients = row.getValue("ingredients") as string[];
+			const ingredients = row.getValue<string[]>("ingredients");
 			return <div>{ingredients.join(", ")}</div>;
 		},
 		type: z.preprocess((obj): string[] => {
@@ -66,59 +66,64 @@ const definition: Definition<MenuItem>[] = [
 ];
 
 function RouteComponent() {
-	const { status, data, error } = useQuery({
-		queryKey: ["menu"],
-		queryFn: get,
-	});
-
-	if (status === "pending") {
-		return <h1>Loading...</h1>;
-	}
-
-	if (status === "error") {
-		return <h1>There was an error when loading the data.</h1>;
-	}
-
-	async function get() {
-		const res = await fetch(`${API_URL}/menu`, { method: "GET" });
-		if (!res.ok) {
-			throw new Error("Network response was not ok");
-		}
+	async function onGet(): Promise<MenuItem[]> {
+		const res = await ok(
+			fetch(`${API_URL}/edit/menu`, {
+				method: "GET",
+			})
+		);
 		return res.json();
 	}
 
 	async function onCreate(entry: MenuItem) {
-		console.log(entry);
-		const res = await fetch(`${API_URL}/menu`, {
-			method: "PUT",
-			body: JSON.stringify(entry),
-		});
-		console.log(res);
+		console.log("Create Start");
+		await ok(
+			fetch(`${API_URL}/edit/menu`, {
+				method: "POST",
+				body: JSON.stringify(entry),
+			})
+		);
+		console.log("Create End");
+	}
+
+	async function onUpdate(from: MenuItem, to: MenuItem) {
+		console.log("Update Start");
+		await ok(
+			fetch(`${API_URL}/edit/menu`, {
+				method: "PUT",
+				body: JSON.stringify({ from, to }),
+			})
+		);
+		console.log("Update End");
+	}
+
+	async function onDelete(entry: MenuItem) {
+		console.log("Delete Start");
+		await ok(
+			fetch(`${API_URL}/edit/menu`, {
+				method: "DELETE",
+				body: JSON.stringify(entry),
+			})
+		);
+		console.log("Delete End");
 	}
 
 	return (
 		<div className="px-4 flex flex-col gap-4">
 			<h1 className="text-2xl font-bold">Edit Menu</h1>
 			<DataTable<MenuItem>
+				queryKey={["edit", "menu"]}
 				definition={definition}
-				data={data}
 				defaultValues={{
 					item: "",
 					price: 0,
 					description: "",
 					ingredients: [],
 				}}
-				onCreate={(menuItem) =>
-					console.log(`Create menu item ${JSON.stringify(menuItem)}`)
-				}
-				onUpdate={(from, to) =>
-					console.log(
-						`Update menu item ${JSON.stringify(from)} to ${JSON.stringify(to)}`
-					)
-				}
-				onDelete={(menuItem) =>
-					console.log(`Delete menu item ${JSON.stringify(menuItem)}`)
-				}
+				onGet={onGet}
+				onCreate={onCreate}
+				onUpdate={onUpdate}
+				onDelete={onDelete}
 			/>
 		</div>
 	);

@@ -6,22 +6,25 @@ import {
 	CreateEntry,
 	UpdateEntry,
 	DeleteEntry,
+	GetEntries,
 } from "./DataTableTypes";
 import { DataTableCreate, DataTableUpdateDelete } from "./DataTableOptions";
 
 interface Props<T> {
-	data: T[];
+	queryKey: any[];
 	definition: Definition<T>[];
 	defaultValues: T;
+	onGet: GetEntries<T>;
 	onCreate: CreateEntry<T>;
 	onUpdate: UpdateEntry<T>;
 	onDelete: DeleteEntry<T>;
 }
 
 function DataTable<T extends object>({
-	data,
+	queryKey,
 	definition,
 	defaultValues,
+	onGet,
 	onCreate,
 	onUpdate,
 	onDelete,
@@ -52,10 +55,15 @@ function DataTable<T extends object>({
 			.concat({
 				id: "actions",
 				header: () =>
-					DataTableCreate(data, definition, defaultValues, onCreate),
+					DataTableCreate(
+						queryKey,
+						definition,
+						defaultValues,
+						onCreate
+					),
 				cell: ({ row }) =>
 					DataTableUpdateDelete(
-						data,
+						queryKey,
 						definition,
 						defaultValues,
 						row,
@@ -67,8 +75,9 @@ function DataTable<T extends object>({
 
 	return (
 		<DataTableRender
-			data={data}
+			queryKey={queryKey}
 			columns={columnDef}
+			onGet={onGet}
 		/>
 	);
 }
