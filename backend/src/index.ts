@@ -8,7 +8,20 @@ import sql from "./sql.js";
 import edit from "./edit.js";
 
 const app = new Hono();
-app.use("/*", cors());
+app.use(
+	"*",
+	cors({
+		origin: [
+			"https://pinkfluffyunicorns.onrender.com",
+			"http://localhost:5173",
+		], // Your frontend URL
+		allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+		allowHeaders: ["Content-Type", "Authorization"],
+		credentials: true, // If using cookies/auth headers
+		exposeHeaders: ["Content-Length", "X-Custom-Header"],
+		maxAge: 86400, // Cache CORS preflight for 24 hours
+	})
+);
 app.route("/edit", edit);
 
 dotenv.config();
@@ -113,7 +126,7 @@ app.get("/logins/:username/:password", async (c) => {
 serve(
 	{
 		fetch: app.fetch,
-		port: 3000,
+		port: 3001,
 	},
 	(info) => {
 		console.log(`Server is running on http://localhost:${info.port}`);
