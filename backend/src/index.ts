@@ -1,6 +1,5 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import postgres from "postgres";
 import { cors } from "hono/cors";
 import dotenv from "dotenv";
 import { googleAuth } from "@hono/oauth-providers/google";
@@ -8,19 +7,7 @@ import sql from "./sql.js";
 import edit from "./edit.js";
 
 const app = new Hono();
-app.use(
-	"*",
-	cors({
-		origin: [
-			"https://pinkfluffyunicorns.onrender.com",
-			"http://localhost:5173",
-		], // Your frontend URL
-		allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-		allowHeaders: ["Content-Type", "Authorization"],
-		exposeHeaders: ["Content-Length", "X-Custom-Header", "Content-Type"],
-		maxAge: 86400, // Cache CORS preflight for 24 hours
-	})
-);
+app.use("*", cors());
 app.route("/edit", edit);
 
 dotenv.config();
@@ -50,10 +37,6 @@ app.get("/google", async (c) => {
 });
 
 //************************************************************************** END OF GOOGLE API ********************************************* */
-
-app.get("/", (c) => {
-	return c.json({ status: "operational" });
-});
 
 app.get("/employees", async (c) => {
 	const employees = await sql`SELECT * FROM employees`;
@@ -125,7 +108,7 @@ app.get("/logins/:username/:password", async (c) => {
 serve(
 	{
 		fetch: app.fetch,
-		port: 3001,
+		port: 3000,
 	},
 	(info) => {
 		console.log(`Server is running on http://localhost:${info.port}`);
