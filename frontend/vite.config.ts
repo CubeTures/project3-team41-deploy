@@ -16,13 +16,5 @@ export default defineConfig({
 			"@": path.resolve(__dirname, "./src"),
 		},
 	},
-	server: {
-		proxy: {
-			"/api": {
-				target: "https://project3-team41-deploy.onrender.com",
-				changeOrigin: true,
-				secure: true,
-			},
-		},
-	},
+	base: "/project3-team41-deploy/",
 });
