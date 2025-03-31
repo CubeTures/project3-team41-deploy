@@ -28,6 +28,8 @@ jobs:
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
         steps:
+            - name: Change directories
+              run: cd frontend
             - name: Checkout
               uses: actions/checkout@v4
             - name: Set up Node
@@ -35,8 +37,7 @@ jobs:
               with:
                   node-version: 20
                   cache: "npm"
-            - name: Change directories
-              run: cd frontend
+
             - name: Install dependencies
               run: npm ci
             - name: Build
