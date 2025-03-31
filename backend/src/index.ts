@@ -17,8 +17,7 @@ app.use(
 		], // Your frontend URL
 		allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 		allowHeaders: ["Content-Type", "Authorization"],
-		credentials: true, // If using cookies/auth headers
-		exposeHeaders: ["Content-Length", "X-Custom-Header"],
+		exposeHeaders: ["Content-Length", "X-Custom-Header", "Content-Type"],
 		maxAge: 86400, // Cache CORS preflight for 24 hours
 	})
 );

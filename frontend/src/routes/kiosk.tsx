@@ -11,7 +11,6 @@ interface MenuItem {
 	ingredients: string[];
 }
 
-
 export const Route = createFileRoute("/kiosk")({
 	component: RouteComponent,
 });
@@ -26,8 +25,18 @@ function RouteComponent() {
 		return res.json();
 	}
 	console.log("Fetching menu...");
-	getMenu().then(menu => console.log("Menu fetched: ", menu));
-	const buttons = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9"];
+	getMenu().then((menu) => console.log("Menu fetched: ", menu));
+	const buttons = [
+		"Item 1",
+		"Item 2",
+		"Item 3",
+		"Item 4",
+		"Item 5",
+		"Item 6",
+		"Item 7",
+		"Item 8",
+		"Item 9",
+	];
 
 	return (
 		// <Button style={{width : "10px", height : "10px"}}>
@@ -35,13 +44,15 @@ function RouteComponent() {
 		// </Button>
 		//create a grid of buttons that is similar to a kiosk
 		// with a button for each item in the menu
-		
+
 		<div className="grid grid-cols-4 gap-4">
 			{buttons.map((label, index) => (
 				<Button
 					key={index}
 					className="col-span-1"
-					onClick={() => window.location.href = `/${label.toLowerCase()}`}
+					onClick={() =>
+						(window.location.href = `/${label.toLowerCase()}`)
+					}
 				>
 					{label}
 				</Button>
