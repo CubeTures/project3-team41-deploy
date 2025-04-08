@@ -22,19 +22,16 @@ app.use(
 		scope: ["openid", "email", "profile"],
 	})
 );
+  
+  app.get('/google', async (c) => {
+	const token = c.get('token')
+	const grantedScopes = c.get('granted-scopes')
+	const user = c.get('user-google')
 
-app.get("/google", async (c) => {
-	const token = c.get("token");
-	const grantedScopes = c.get("granted-scopes");
-	const user = c.get("user-google");
-
-	// TODO: Don't redirect to localhost
-	const redirectUrl = `http://localhost:5175/callback?token=${token}&user=${encodeURIComponent(
-		JSON.stringify(user)
-	)}`;
-
+	const redirectUrl = `https://pinkfluffy.netlify.app/kiosk/?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`;
+  
 	return c.redirect(redirectUrl);
-});
+  })
 
 //************************************************************************** END OF GOOGLE API ********************************************* */
 
