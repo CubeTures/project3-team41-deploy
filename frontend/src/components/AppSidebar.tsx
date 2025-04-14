@@ -288,7 +288,7 @@ function AppSidebar({ children }: Props) {
 	}
 
 	return (
-		<SidebarProvider>
+		<SidebarProvider defaultOpen={currentPath != "/kiosk"}>
 			<Sidebar>
 				<SidebarHeader>{Header()}</SidebarHeader>
 				<SidebarContent>{groups.map(AppSidebarGroup)}</SidebarContent>

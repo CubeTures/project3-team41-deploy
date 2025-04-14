@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PaymentImport } from './routes/payment'
 import { Route as OrderImport } from './routes/order'
 import { Route as KioskImport } from './routes/kiosk'
 import { Route as HistoryImport } from './routes/history'
@@ -25,6 +26,12 @@ import { Route as EditInventoryImport } from './routes/edit/inventory'
 import { Route as EditEmployeesImport } from './routes/edit/employees'
 
 // Create/Update Routes
+
+const PaymentRoute = PaymentImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const OrderRoute = OrderImport.update({
   id: '/order',
@@ -137,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrderImport
       parentRoute: typeof rootRoute
     }
+    '/payment': {
+      id: '/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentImport
+      parentRoute: typeof rootRoute
+    }
     '/edit/employees': {
       id: '/edit/employees'
       path: '/edit/employees'
@@ -197,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/history': typeof HistoryRoute
   '/kiosk': typeof KioskRoute
   '/order': typeof OrderRoute
+  '/payment': typeof PaymentRoute
   '/edit/employees': typeof EditEmployeesRoute
   '/edit/inventory': typeof EditInventoryRoute
   '/edit/menu': typeof EditMenuRoute
@@ -212,6 +227,7 @@ export interface FileRoutesByTo {
   '/history': typeof HistoryRoute
   '/kiosk': typeof KioskRoute
   '/order': typeof OrderRoute
+  '/payment': typeof PaymentRoute
   '/edit/employees': typeof EditEmployeesRoute
   '/edit/inventory': typeof EditInventoryRoute
   '/edit/menu': typeof EditMenuRoute
@@ -228,6 +244,7 @@ export interface FileRoutesById {
   '/history': typeof HistoryRoute
   '/kiosk': typeof KioskRoute
   '/order': typeof OrderRoute
+  '/payment': typeof PaymentRoute
   '/edit/employees': typeof EditEmployeesRoute
   '/edit/inventory': typeof EditInventoryRoute
   '/edit/menu': typeof EditMenuRoute
@@ -245,6 +262,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/kiosk'
     | '/order'
+    | '/payment'
     | '/edit/employees'
     | '/edit/inventory'
     | '/edit/menu'
@@ -259,6 +277,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/kiosk'
     | '/order'
+    | '/payment'
     | '/edit/employees'
     | '/edit/inventory'
     | '/edit/menu'
@@ -273,6 +292,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/kiosk'
     | '/order'
+    | '/payment'
     | '/edit/employees'
     | '/edit/inventory'
     | '/edit/menu'
@@ -289,6 +309,7 @@ export interface RootRouteChildren {
   HistoryRoute: typeof HistoryRoute
   KioskRoute: typeof KioskRoute
   OrderRoute: typeof OrderRoute
+  PaymentRoute: typeof PaymentRoute
   EditEmployeesRoute: typeof EditEmployeesRoute
   EditInventoryRoute: typeof EditInventoryRoute
   EditMenuRoute: typeof EditMenuRoute
@@ -304,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   HistoryRoute: HistoryRoute,
   KioskRoute: KioskRoute,
   OrderRoute: OrderRoute,
+  PaymentRoute: PaymentRoute,
   EditEmployeesRoute: EditEmployeesRoute,
   EditInventoryRoute: EditInventoryRoute,
   EditMenuRoute: EditMenuRoute,
@@ -328,6 +350,7 @@ export const routeTree = rootRoute
         "/history",
         "/kiosk",
         "/order",
+        "/payment",
         "/edit/employees",
         "/edit/inventory",
         "/edit/menu",
@@ -351,6 +374,9 @@ export const routeTree = rootRoute
     },
     "/order": {
       "filePath": "order.tsx"
+    },
+    "/payment": {
+      "filePath": "payment.tsx"
     },
     "/edit/employees": {
       "filePath": "edit/employees.tsx"

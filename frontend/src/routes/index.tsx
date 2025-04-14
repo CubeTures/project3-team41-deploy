@@ -1,43 +1,36 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
 import EmployeeLogin from "@/components/EmployeeLogin";
 import { API_URL } from "@/lib/constants";
+import { Translate } from "@/components/translate";
 
 export const Route = createFileRoute("/")({
-	component: Index,
+  component: Index,
 });
+
 
 // Make index.tsx into the login screen
 function Index() {
-	// Create a request to the backend at "/" and parse the request
-	// useEffect(() => {
-	// 	async function getHome() {
-	// 		const res = await fetch("http://localhost:3000/");
-	// 		const json = await res.json();
-	// 		console.log(json["status"]);
-	// 	}
+  return (
+    <div className = "relative h-screen flex flex-col items-center justify-center bg-black">
+      <img src = "PFU.jpg" alt = "Pink Fluffy Unicorns Logo" className= "h-128 w-128 object-scale-down px-20"></img>
 
-	// 	getHome();
-	// }, []);
+      <div className="absolute top-4 right-4"><EmployeeLogin/></div>
 
-	return (
-		<div>
-			<h1>Welcome</h1>
-			<br />
-			<Button
-				onClick={() => {
-					window.location.href = `${API_URL}/google`;
-				}}
-			>
-				Login with Google
-			</Button>
+      <h1 className = "text-8xl font-bold mb-10">Welcome!</h1>
+      <br />
 
-			<Link to="/kiosk">
-				<Button>Login as Guest</Button>
-			</Link>
+      <Button className = "text-4xl mb-4 py-8" onClick = { () => {
+        window.location.href = `${API_URL}/google`;
+      }}>
+        Login with Google
+      </Button>
 
-			<EmployeeLogin />
-		</div>
-	);
+    <Link to="/kiosk">
+	  <Button className="text-4xl py-8">
+        Login as Guest
+      </Button>
+      </Link>
+    </div>
+  );
 }

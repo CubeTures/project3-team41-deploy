@@ -13,6 +13,7 @@ interface Ingredient {
 	ingredient: string;
 	cost: number;
 	quantity: number;
+	allergens: string[];
 }
 
 const definition: Definition<Ingredient>[] = [
@@ -47,6 +48,19 @@ const definition: Definition<Ingredient>[] = [
 			return <div>{amount.toLocaleString()}</div>;
 		},
 		type: z.coerce.number().min(0),
+	},
+	{
+		accessorKey: "allergens",
+		header: "Allergens",
+		type: z.preprocess((obj): string[] => {
+			if (Array.isArray(obj)) {
+				return obj;
+			} else if (typeof obj === "string") {
+				return obj.split(",");
+			} else {
+				return [];
+			}
+		}, z.array(z.string().nonempty())),
 	},
 ];
 
@@ -93,6 +107,7 @@ function RouteComponent() {
 					ingredient: "",
 					cost: 0,
 					quantity: 0,
+					allergens: [],
 				}}
 				onGet={onGet}
 				onCreate={onCreate}

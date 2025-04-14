@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build" # Modify if you don’t need a build step
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
