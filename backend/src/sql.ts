@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import dotenv from "dotenv";
 
-dotenv.config({ path: "./secrets.env" });
+dotenv.config({ path: "./.env" });
 const sql = postgres({
 	user: process.env.user,
 	host: process.env.host,
