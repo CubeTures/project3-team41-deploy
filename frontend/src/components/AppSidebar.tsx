@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ValidateLinkOptions } from "@tanstack/react-router";
-import { Fragment, ReactElement } from "react";
+import { Fragment, ReactElement, useState, useEffect } from "react";
 import UnicornLogo from "@/assets/PFU.jpg";
 import {
 	Breadcrumb,
@@ -40,6 +40,12 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from "./ui/breadcrumb";
+import { Translate } from "@/components/translate";
+import { Button } from "./ui/button";
+
+interface UserRole {
+	role: string;
+}
 
 interface Group {
 	group: string;
@@ -87,11 +93,6 @@ const groups: Group[] = [
 				button: "Display Menu",
 				icon: <BookOpenText />,
 				link: { to: "/display" },
-			},
-			{
-				button: "Transaction History",
-				icon: <Clock />,
-				link: { to: "/history" },
 			},
 		],
 	},
@@ -146,9 +147,30 @@ interface Props {
 	children: ReactElement;
 }
 
+function getVisibleSections(userRole: UserRole): Group[] {
+	if (userRole.role == "manager") {
+		return groups;
+	} else if (userRole.role == "employee") {
+		return groups.filter((g) => g.group != "Manager");
+	} else if (userRole.role == "customer") {
+		return groups.filter((g) => g.group == "Customer");
+	}
+
+	return groups.filter((g) => g.group == "Customer");
+}
+
 function AppSidebar({ children }: Props) {
 	const router = useRouterState();
 	const currentPath = router.location.pathname;
+	const [highContrast, setHighContrast] = useState(false);
+	const [userRole, setUserRole] = useState<UserRole>({ role: "customer" });
+
+	useEffect(() => {
+		const r = localStorage.getItem("userRole");
+		if (r) {
+			setUserRole({ role: r });
+		}
+	}, []);
 
 	if (currentPath == "/") {
 		return children;
@@ -159,6 +181,7 @@ function AppSidebar({ children }: Props) {
 			<div className="flex gap-4 items-center">
 				<img
 					src={UnicornLogo}
+					alt="Pink Fluffy Unicorn Logo"
 					className="rounded"
 					height={36}
 					width={36}
@@ -288,25 +311,41 @@ function AppSidebar({ children }: Props) {
 	}
 
 	return (
-		<SidebarProvider defaultOpen={currentPath != "/kiosk"}>
-			<Sidebar>
-				<SidebarHeader>{Header()}</SidebarHeader>
-				<SidebarContent>{groups.map(AppSidebarGroup)}</SidebarContent>
-			</Sidebar>
-			<SidebarInset className="overflow-hidden">
-				<header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-					<div className="flex items-center gap-2 px-4">
-						<SidebarTrigger className="-ml-1" />
-						<Separator
-							orientation="vertical"
-							className="mr-2 h-4"
-						/>
-						{Breadcrumbs()}
-					</div>
-				</header>
-				{children}
-			</SidebarInset>
-		</SidebarProvider>
+		<div className={highContrast ? "high-contrast" : ""}>
+			<SidebarProvider defaultOpen={currentPath != "/kiosk"}>
+				<Sidebar>
+					<SidebarHeader>{Header()}</SidebarHeader>
+					<SidebarContent>
+						{getVisibleSections(userRole).map(AppSidebarGroup)}
+					</SidebarContent>
+				</Sidebar>
+				<SidebarInset className="overflow-hidden">
+					<header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+						<div className="flex grow px-4 items-center justify-between">
+							<div className="flex items-center gap-2">
+								<SidebarTrigger className="-ml-1" />
+								<Separator
+									orientation="vertical"
+									className="mr-2 h-4"
+								/>
+								{Breadcrumbs()}
+							</div>
+							<div className="flex gap-2 items-center">
+								<Translate />
+								<Button
+									onClick={() =>
+										setHighContrast(!highContrast)
+									}
+								>
+									Toggle High Contrast
+								</Button>
+							</div>
+						</div>
+					</header>
+					{children}
+				</SidebarInset>
+			</SidebarProvider>
+		</div>
 	);
 }
 

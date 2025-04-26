@@ -14,7 +14,6 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as PaymentImport } from './routes/payment'
 import { Route as OrderImport } from './routes/order'
 import { Route as KioskImport } from './routes/kiosk'
-import { Route as HistoryImport } from './routes/history'
 import { Route as DisplayImport } from './routes/display'
 import { Route as IndexImport } from './routes/index'
 import { Route as ReportZImport } from './routes/report/z'
@@ -42,12 +41,6 @@ const OrderRoute = OrderImport.update({
 const KioskRoute = KioskImport.update({
   id: '/kiosk',
   path: '/kiosk',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const HistoryRoute = HistoryImport.update({
-  id: '/history',
-  path: '/history',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -121,13 +114,6 @@ declare module '@tanstack/react-router' {
       path: '/display'
       fullPath: '/display'
       preLoaderRoute: typeof DisplayImport
-      parentRoute: typeof rootRoute
-    }
-    '/history': {
-      id: '/history'
-      path: '/history'
-      fullPath: '/history'
-      preLoaderRoute: typeof HistoryImport
       parentRoute: typeof rootRoute
     }
     '/kiosk': {
@@ -208,7 +194,6 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/display': typeof DisplayRoute
-  '/history': typeof HistoryRoute
   '/kiosk': typeof KioskRoute
   '/order': typeof OrderRoute
   '/payment': typeof PaymentRoute
@@ -224,7 +209,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/display': typeof DisplayRoute
-  '/history': typeof HistoryRoute
   '/kiosk': typeof KioskRoute
   '/order': typeof OrderRoute
   '/payment': typeof PaymentRoute
@@ -241,7 +225,6 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/display': typeof DisplayRoute
-  '/history': typeof HistoryRoute
   '/kiosk': typeof KioskRoute
   '/order': typeof OrderRoute
   '/payment': typeof PaymentRoute
@@ -259,7 +242,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/display'
-    | '/history'
     | '/kiosk'
     | '/order'
     | '/payment'
@@ -274,7 +256,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/display'
-    | '/history'
     | '/kiosk'
     | '/order'
     | '/payment'
@@ -289,7 +270,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/display'
-    | '/history'
     | '/kiosk'
     | '/order'
     | '/payment'
@@ -306,7 +286,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DisplayRoute: typeof DisplayRoute
-  HistoryRoute: typeof HistoryRoute
   KioskRoute: typeof KioskRoute
   OrderRoute: typeof OrderRoute
   PaymentRoute: typeof PaymentRoute
@@ -322,7 +301,6 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DisplayRoute: DisplayRoute,
-  HistoryRoute: HistoryRoute,
   KioskRoute: KioskRoute,
   OrderRoute: OrderRoute,
   PaymentRoute: PaymentRoute,
@@ -347,7 +325,6 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/display",
-        "/history",
         "/kiosk",
         "/order",
         "/payment",
@@ -365,9 +342,6 @@ export const routeTree = rootRoute
     },
     "/display": {
       "filePath": "display.tsx"
-    },
-    "/history": {
-      "filePath": "history.tsx"
     },
     "/kiosk": {
       "filePath": "kiosk.tsx"

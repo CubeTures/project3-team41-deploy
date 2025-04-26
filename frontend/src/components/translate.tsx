@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
+import { Globe } from "lucide-react";
 
 declare global {
   interface Window {
@@ -15,7 +16,7 @@ declare global {
   }
 }
 
-export function Translate() {
+export function Translate() { //Its all one component
   const [isVisible, setIsVisible] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -39,21 +40,21 @@ export function Translate() {
   }, []);
 
   return (
-    <>
-      <Button
+    <div className="relative inline-block">
+      <Button //Make the transaltion thing hidden
         onClick={() => setIsVisible((prev) => !prev)}
-        className="fixed bottom-12 right-4 z-50"
+        className="z-50"
       >
-        {isVisible ? "Hide Language" : "Select Language"}
+        <Globe/>
       </Button>
 
       <div
         id="google_translate_element"
         ref={containerRef}
-        className={`fixed bottom-24 right-4 z-40 bg-white p-2 rounded shadow ${
+        className={`absolute left-0 mt-2 z-40 bg-white p-2 rounded shadow ${
           isVisible ? "visible" : "invisible"
         }`}
       />
-    </>
+    </div>
   );
 }

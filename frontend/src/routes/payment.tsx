@@ -17,7 +17,7 @@ function PaymentComponent() {
 				customerName = "",
 				drinks = [],
 				total = 0
-			} = {}
+			}
 		}
 	} = useRouterState()
 
@@ -57,7 +57,7 @@ function PaymentComponent() {
 				setError(data.message || "Payment failed.")
 			} else {
 				alert("Payment successful!")
-				navigate({ to: "/order" })
+				navigate({ to: "/" })
 			}
 		} catch (err) {
 			console.error("err:", err)

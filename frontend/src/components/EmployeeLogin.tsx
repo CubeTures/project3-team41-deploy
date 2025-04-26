@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -71,11 +71,13 @@ export function ProfileForm() {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const check = await CheckLogin(values as LoginForm);
-    if (check == 1) {
+    if (check == 0) {
       //Employee
+      localStorage.setItem("userRole", "employee");
       window.location.href = "/order";
-    } else if (check == 2) {
+    } else if (check == 1) {
       //Manager
+      localStorage.setItem("userRole", "manager");
       window.location.href = "/display";
     } else {
       //Invalid
@@ -107,7 +109,7 @@ export function ProfileForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="your_password" {...field} />
+                <Input type="password" placeholder="your_password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

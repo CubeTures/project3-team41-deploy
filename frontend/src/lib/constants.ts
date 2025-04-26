@@ -1,4 +1,5 @@
-const environment = process.env.NODE_ENV;
+const environment = process.env.NODE_ENV; //Must be named NODE_ENV
+
 
 export const API_URL =
     environment === "development"

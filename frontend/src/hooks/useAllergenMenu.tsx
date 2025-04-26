@@ -22,8 +22,17 @@ const allergenIconMap: { [allergen: string]: any } = {
 	fent: <Snowflake />,
 };
 
+interface MenuItem {
+	item: string;
+	price: number;
+	description: string;
+	ingredients: string[];
+	image_url: string;
+	allergens: any[];
+}
+
 export function useAllergenMenu() {
-	const [menu, setMenu] = useState<any[]>([]);
+	const [menu, setMenu] = useState<MenuItem[]>([]);
 
 	useEffect(() => {
 		async function get() {

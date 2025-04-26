@@ -14,7 +14,10 @@ const Employee = [
 	"wage",
 ];
 
-app.get("/menu", async (c) => {
+
+//Getters and setters for all tables basically
+
+app.get("/menu", async (c) => { // Shrimple HTML command
 	const menu = await sql`SELECT * FROM menu`;
 	return c.json(menu);
 });
@@ -38,7 +41,7 @@ app.delete("/menu", async (c) => {
 	return c.body("Operation Completed.", 200);
 });
 
-app.get("/inventory", async (c) => {
+app.get("/inventory", async (c) => { //Also shrimple
 	const inventory = await sql`SELECT * from ingredients`;
 	return c.json(inventory);
 });
