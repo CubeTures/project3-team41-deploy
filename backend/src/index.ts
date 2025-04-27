@@ -33,7 +33,7 @@ app.use(
 	const grantedScopes = c.get('granted-scopes')
 	const user = c.get('user-google')
 
-	const redirectUrl = `http://localhost:5173/kiosk/?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`;
+	const redirectUrl = `http://pinkfluffy.netlify.app/kiosk/?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`;
   
 	return c.redirect(redirectUrl);
   })

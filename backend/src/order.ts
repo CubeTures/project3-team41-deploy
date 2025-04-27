@@ -35,21 +35,21 @@ order.post("/", async (c) => {
 			return c.json({ success: false, message: "Payment failed: Invalid card." }, 400);
 		}
 
-		const customer = await sql`
-			SELECT * FROM customers
-			WHERE customer_name = ${customer_name} AND credit_card = ${credit_card}
-		`;
+		// const customer = await sql`
+		// 	SELECT * FROM customers
+		// 	WHERE customer_name = ${customer_name} AND credit_card = ${credit_card}
+		// `;
 
-		if (customer.length === 0) {
-			await sql`
-				INSERT INTO customers (credit_card, reward_tier, customer_name)
-				VALUES (${credit_card}, ${1}, ${customer_name})
-			`;
-		}
+		// if (customer.length === 0) {
+		// 	await sql`
+		// 		INSERT INTO customers (credit_card, reward_tier, customer_name)
+		// 		VALUES (${credit_card}, ${1}, ${customer_name})
+		// 	`;
+		// }
 
 		await sql`
-			INSERT INTO orders (customer_name, drinks, price, date, time)
-			VALUES (${customer_name}, ${drinks}, ${price}, CURRENT_DATE, CURRENT_TIME)
+			INSERT INTO orders (order_id, credit_card, drinks, price, date, time)
+			VALUES (DEFAULT, ${credit_card}, ${drinks}, ${price}, CURRENT_DATE, CURRENT_TIME)
 		`;
 
 		await addXReport(customer_name, drinks, price);

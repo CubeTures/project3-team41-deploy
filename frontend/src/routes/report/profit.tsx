@@ -103,10 +103,9 @@ function RouteComponent() {
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             placeholder="Start Date"
-            className="border-none focus:outline-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden [&::-webkit-datetime-edit-text]:hidden appearance-none"
+            className="border-none focus:outline-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden appearance-none"
             style={{ WebkitAppearance: 'none' }}
             id="start-date"
-            readOnly
           />
           <button
             onClick={() => {
@@ -126,10 +125,9 @@ function RouteComponent() {
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             placeholder="End Date"
-            className="border-none focus:outline-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden [&::-webkit-datetime-edit-text]:hidden appearance-none"
+            className="border-none focus:outline-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden appearance-none"
             style={{ WebkitAppearance: 'none' }}
             id="end-date"
-            readOnly
           />
           <button
             onClick={() => {

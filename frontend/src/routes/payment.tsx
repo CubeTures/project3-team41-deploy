@@ -1,15 +1,39 @@
 import { createFileRoute, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API_URL } from "@/lib/constants";
 
 export const Route = createFileRoute("/payment")({
 	component: PaymentComponent,
 });
 
+interface UserRole {
+	role: string;
+}
+
+function redirectPage(userRole: UserRole): string {
+	if (userRole.role == "manager") {
+		return "/order";
+	} else if (userRole.role == "employee") {
+		return "/order";
+	} else if (userRole.role == "customer") {
+		return "/";
+	}
+
+	return "/";
+}
+
 function PaymentComponent() {
 	const navigate = useNavigate()
+	const [userRole, setUserRole] = useState<UserRole>({ role: "customer" });
+
+	useEffect(() => {
+		const r = localStorage.getItem("userRole");
+		if (r) {
+			setUserRole({ role: r });
+		}
+	}, []);
 
 	const {
 		location: {
@@ -57,7 +81,7 @@ function PaymentComponent() {
 				setError(data.message || "Payment failed.")
 			} else {
 				alert("Payment successful!")
-				navigate({ to: "/" })
+				navigate({ to: redirectPage(userRole) })
 			}
 		} catch (err) {
 			console.error("err:", err)
